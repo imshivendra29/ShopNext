@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShopNext.Data;
 
@@ -11,9 +12,11 @@ using ShopNext.Data;
 namespace ShopNext.Migrations
 {
     [DbContext(typeof(ShopNextDbContext))]
-    partial class ShopNextDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260513201949_ProductModules")]
+    partial class ProductModules
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,16 +169,6 @@ namespace ShopNext.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 11,
-                            Email = "admin@shopnext.com",
-                            Name = "Admin",
-                            PasswordHash = "$2a$11$SqQcQVuv/pJ/wwUAqP7fYuCpIAhlBIO1dGswD4BejbJArimjHNqgy",
-                            Role = "Admin"
-                        });
                 });
 
             modelBuilder.Entity("ShopNext.Models.Product", b =>

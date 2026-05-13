@@ -275,6 +275,25 @@ Token contains:
 - `exp` — expiry timestamp
 
 ---
+## Category Module
+
+Built a full CRUD Category API with clean layered architecture.
+
+### Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/category` | Get all categories | No |
+| GET | `/api/category/{id}` | Get category by ID | No |
+| POST | `/api/category` | Create category | Admin only |
+| PUT | `/api/category/{id}` | Update category | Admin only |
+| DELETE | `/api/category/{id}` | Delete category | Admin only |
+
+### Tech Decisions
+- Only Admin can create, update, delete categories
+- Public GET endpoints — no auth required
+- Soft delete via `IsActive` flag supported
+
 
 ## Roadmap
 
@@ -282,6 +301,7 @@ Token contains:
 - [x] JWT Authentication
 - [x] Profile CRUD
 - [x] Role-based Authorization
+- [x] Category Module (CRUD)
 - [ ] Products Module
 - [ ] Cart Module
 - [ ] Orders Module
@@ -289,7 +309,6 @@ Token contains:
 - [ ] Cloudinary Image Upload
 - [ ] Rate Limiting
 - [ ] OTP Verification
-
 ---
 
 ## Author

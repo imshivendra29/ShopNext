@@ -13,8 +13,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+//auth
 builder.Services.AddScoped<IAuthService, AuthService>();
+// user
 builder.Services.AddScoped<IUserService, UserService>();
+// category
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+// product
+
+// review
+
+
 builder.Services.AddScoped<JwtHelper>();
 builder.Services.AddDbContext<ShopNextDbContext>(options =>
     options.UseSqlServer(
