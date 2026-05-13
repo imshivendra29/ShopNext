@@ -293,7 +293,24 @@ Built a full CRUD Category API with clean layered architecture.
 - Only Admin can create, update, delete categories
 - Public GET endpoints — no auth required
 - Soft delete via `IsActive` flag supported
+## Product Module
 
+Built a full CRUD Product API with Admin-only write access.
+
+### Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/product` | Get all products | No |
+| GET | `/api/product/{id}` | Get product by ID | No |
+| POST | `/api/product` | Create product | Admin only |
+| PUT | `/api/product/{id}` | Update product | Admin only |
+| DELETE | `/api/product/{id}` | Delete product | Admin only |
+
+### Tech Decisions
+- Admin ID automatically extracted from JWT token on create
+- Product response includes Category name via Include/Join
+- Stock and IsActive managed separately
 
 ## Roadmap
 
@@ -302,7 +319,7 @@ Built a full CRUD Category API with clean layered architecture.
 - [x] Profile CRUD
 - [x] Role-based Authorization
 - [x] Category Module (CRUD)
-- [ ] Products Module
+- [*] Products Module
 - [ ] Cart Module
 - [ ] Orders Module
 - [ ] PhonePe Payment Integration

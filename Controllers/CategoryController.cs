@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShopNext.DTOs.Category;
-using ShopNext.Repositories.Interfaces;
+using ShopNext.Services;
 
 namespace ShopNext.Controllers
 {

@@ -1,7 +1,8 @@
 ﻿using ShopNext.DTOs.Category;
 using ShopNext.Models;
+using ShopNext.Repositories.Interfaces;
 
-namespace ShopNext.Repositories.Interfaces
+namespace ShopNext.Services
 {
     public class CategoryService : ICategoryService
     {

@@ -1,6 +1,6 @@
 ﻿using ShopNext.DTOs.Category;
 
-namespace ShopNext.Repositories.Interfaces
+namespace ShopNext.Services
 {
     public interface ICategoryService
     {
