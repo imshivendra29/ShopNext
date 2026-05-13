@@ -311,7 +311,24 @@ Built a full CRUD Product API with Admin-only write access.
 - Admin ID automatically extracted from JWT token on create
 - Product response includes Category name via Include/Join
 - Stock and IsActive managed separately
+## Review Module
 
+Users can post, update, and delete reviews on products.
+
+### Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/review/{productId}` | Get all reviews for a product | No |
+| POST | `/api/review` | Add a review | User |
+| PUT | `/api/review/{id}` | Update your review | User |
+| DELETE | `/api/review/{id}` | Delete your review | User |
+
+### Tech Decisions
+- One review per user per product (duplicate check enforced)
+- Only owner can update or delete their review
+- Product AverageRating and ReviewCount auto-updated on review create
+- User loaded via EF Core Include for response
 ## Roadmap
 
 - [x] User Auth (Register / Login)
@@ -319,8 +336,9 @@ Built a full CRUD Product API with Admin-only write access.
 - [x] Profile CRUD
 - [x] Role-based Authorization
 - [x] Category Module (CRUD)
-- [*] Products Module
-- [ ] Cart Module
+- [x] Products Module
+- [x] Review Module (CRUD with duplicate protection)
+- [] Cart Module
 - [ ] Orders Module
 - [ ] PhonePe Payment Integration
 - [ ] Cloudinary Image Upload
