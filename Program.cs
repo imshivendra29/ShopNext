@@ -32,7 +32,9 @@ builder.Services.AddScoped<ICartService, CartService>();
 //order
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-//
+//address
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+builder.Services.AddScoped<IAddressService, AddressService>();
 
 //cloudanry- maybe spelling mistake but I am not sure
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
