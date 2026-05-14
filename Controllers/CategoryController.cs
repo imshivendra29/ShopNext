@@ -31,10 +31,9 @@ namespace ShopNext.Controllers
             if (category == null) return NotFound(new { message = "Category not found" });
             return Ok(category);
         }
-
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([FromBody] CreateCategoryDto dto)
+        public async Task<IActionResult> Create([FromForm] CreateCategoryDto dto)
         {
             var category = await _service.CreateAsync(dto);
             return Ok(category);
@@ -42,7 +41,7 @@ namespace ShopNext.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoryDto dto)
+        public async Task<IActionResult> Update(int id, [FromForm] UpdateCategoryDto dto)
         {
             var category = await _service.UpdateAsync(id, dto);
             if (category == null) return NotFound(new { message = "Category not found" });

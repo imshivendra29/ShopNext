@@ -101,9 +101,14 @@ cp appsettings.example.json appsettings.json
 ```json
 {
   "Jwt": {
-    "Key": "YOUR_SECRET_KEY_MIN_32_CHARS",
+    "Key": "addkey-32-char-min",
     "Issuer": "ShopNest",
     "Audience": "ShopNestUsers"
+  },
+  "Cloudinary": {
+    "CloudName": "addname",
+    "ApiKey": "addkey",
+    "ApiSecret": "addkey"
   },
   "ConnectionStrings": {
     "DefaultConnection": "Server=YOUR_SERVER;Database=ShopNextDb;User ID=sa;Password=YOUR_PASSWORD;TrustServerCertificate=True"
@@ -370,8 +375,33 @@ Users can place orders directly from their cart with COD or Online payment suppo
 - COD and Online payment methods supported
 - Only Admin can update order status
 
+## Cloudinary Image Upload
 
+All images (Products and Categories) are uploaded to Cloudinary via the backend. Frontend never directly communicates with Cloudinary — API keys stay secure on the server.
 
+### How it works
+1. Admin sends image as `multipart/form-data` to the API
+2. Backend uploads image to Cloudinary
+3. Cloudinary returns a secure URL
+4. URL is saved in the database
+
+### Image Optimization
+All uploaded images are automatically:
+- Resized to max 800x800
+- Quality optimized (`auto`)
+- Format optimized (`auto` — WebP where supported)
+
+### Folder Structure on Cloudinary
+### Endpoints that accept images
+
+| Method | Endpoint | Field Name |
+|--------|----------|------------|
+| POST | `/api/product` | `Image` |
+| PUT | `/api/product/{id}` | `Image` |
+| POST | `/api/category` | `Image` |
+| PUT | `/api/category/{id}` | `Image` |
+
+> All image endpoints use `multipart/form-data`, not `application/json`.
 ## Roadmap
 
 - [x] User Auth (Register / Login)
@@ -384,7 +414,7 @@ Users can place orders directly from their cart with COD or Online payment suppo
 - [x] Cart Module
 - [x] Orders Module
 - [ ] PhonePe Payment Integration
-- [ ] Cloudinary Image Upload
+- [x] Cloudinary Image Upload
 - [ ] Rate Limiting
 - [ ] OTP Verification
 ---

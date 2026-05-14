@@ -32,6 +32,11 @@ namespace ShopNext.Repositories.Implementations
         {
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
+
+            await _context.Entry(product)
+                .Reference(p => p.Category)
+                .LoadAsync();
+
             return product;
         }
 

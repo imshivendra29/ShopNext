@@ -33,6 +33,9 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 //
+
+//cloudanry- maybe spelling mistake but I am not sure
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<JwtHelper>();
 builder.Services.AddDbContext<ShopNextDbContext>(options =>
     options.UseSqlServer(

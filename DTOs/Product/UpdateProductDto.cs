@@ -9,6 +9,8 @@
         public string? ImageUrl { get; set; }
         public int CategoryId { get; set; }
         public bool IsActive { get; set; }
+        public IFormFile? Image { get; set; }
+
 
     }
 }

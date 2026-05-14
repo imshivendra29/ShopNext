@@ -7,10 +7,12 @@ namespace ShopNext.Services
     public class ProductService : IProductService
     {
         private readonly IProductRepository _repository;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public ProductService(IProductRepository repository)
+        public ProductService(IProductRepository repository, ICloudinaryService cloudinaryService)
         {
             _repository = repository;
+            _cloudinaryService = cloudinaryService;
         }
 
         public async Task<List<ProductResponseDto>> GetAllAsync()
@@ -55,13 +57,17 @@ namespace ShopNext.Services
 
         public async Task<ProductResponseDto> CreateAsync(CreateProductDto dto, int adminId)
         {
+            string? imageUrl = null;
+            if (dto.Image != null)
+                imageUrl = await _cloudinaryService.UploadImageAsync(dto.Image, "shopnext/products");
+
             var product = new Product
             {
                 Name = dto.Name,
                 Description = dto.Description,
                 Price = dto.Price,
                 Stock = dto.Stock,
-                ImageUrl = dto.ImageUrl,
+                ImageUrl = imageUrl,
                 CategoryId = dto.CategoryId,
                 CreatedBy = adminId
             };
@@ -80,19 +86,22 @@ namespace ShopNext.Services
                 ReviewCount = created.ReviewCount,
                 IsActive = created.IsActive,
                 DateCreated = created.DateCreated,
-                CategoryName = ""
+                CategoryName = created.Category.Name
             };
         }
-
         public async Task<ProductResponseDto?> UpdateAsync(int id, UpdateProductDto dto)
         {
+            string? imageUrl = null;
+            if (dto.Image != null)
+                imageUrl = await _cloudinaryService.UploadImageAsync(dto.Image, "shopnext/products");
+
             var product = new Product
             {
                 Name = dto.Name,
                 Description = dto.Description,
                 Price = dto.Price,
                 Stock = dto.Stock,
-                ImageUrl = dto.ImageUrl,
+                ImageUrl = imageUrl,
                 CategoryId = dto.CategoryId,
                 IsActive = dto.IsActive
             };
@@ -112,7 +121,7 @@ namespace ShopNext.Services
                 ReviewCount = updated.ReviewCount,
                 IsActive = updated.IsActive,
                 DateCreated = updated.DateCreated,
-                CategoryName = ""
+                CategoryName = updated.Category.Name
             };
         }
 

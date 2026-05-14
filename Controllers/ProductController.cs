@@ -34,7 +34,7 @@ namespace ShopNext.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([FromBody] CreateProductDto dto)
+        public async Task<IActionResult> Create([FromForm] CreateProductDto dto)
         {
             var adminId = int.Parse(User.FindFirst("uid")!.Value);
             var product = await _service.CreateAsync(dto, adminId);
@@ -43,7 +43,7 @@ namespace ShopNext.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateProductDto dto)
+        public async Task<IActionResult> Update(int id, [FromForm] UpdateProductDto dto)
         {
             var product = await _service.UpdateAsync(id, dto);
             if (product == null) return NotFound(new { message = "Product not found" });

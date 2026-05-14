@@ -7,13 +7,15 @@ namespace ShopNext.Services
     public class CategoryService : ICategoryService
     {
         private readonly ICategoryRepository _repository;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public CategoryService(ICategoryRepository repository)
+        public CategoryService(ICategoryRepository repository, ICloudinaryService cloudinaryService)
         {
             _repository = repository;
+            _cloudinaryService = cloudinaryService;
         }
 
-        
+
         public async Task<List<CategoryResponseDto>> GetAllAsync()
         {
             var categories = await _repository.GetAllAsync();
@@ -48,11 +50,15 @@ namespace ShopNext.Services
         //Description and ImageUrl are optional in CreateCategoryDto, so we need to handle null values when creating a new Category
         public async Task<CategoryResponseDto> CreateAsync(CreateCategoryDto dto)
         {
+            string? imageUrl = null;
+            if (dto.Image != null)
+                imageUrl = await _cloudinaryService.UploadImageAsync(dto.Image, "shopnext/categories");
+
             var category = new Category
             {
                 Name = dto.Name,
                 Description = dto.Description,
-                ImageUrl = dto.ImageUrl
+                ImageUrl = imageUrl
             };
 
             var created = await _repository.CreateAsync(category);
@@ -68,14 +74,17 @@ namespace ShopNext.Services
             };
         }
 
-        
         public async Task<CategoryResponseDto?> UpdateAsync(int id, UpdateCategoryDto dto)
         {
+            string? imageUrl = null;
+            if (dto.Image != null)
+                imageUrl = await _cloudinaryService.UploadImageAsync(dto.Image, "shopnext/categories");
+
             var category = new Category
             {
                 Name = dto.Name,
                 Description = dto.Description,
-                ImageUrl = dto.ImageUrl,
+                ImageUrl = imageUrl,
                 IsActive = dto.IsActive
             };
 
@@ -93,7 +102,7 @@ namespace ShopNext.Services
             };
         }
 
-        
+
         public async Task<bool> DeleteAsync(int id)
         {
             return await _repository.DeleteAsync(id);
