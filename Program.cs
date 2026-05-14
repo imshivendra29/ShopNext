@@ -30,6 +30,9 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
 //order
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+//
 builder.Services.AddScoped<JwtHelper>();
 builder.Services.AddDbContext<ShopNextDbContext>(options =>
     options.UseSqlServer(

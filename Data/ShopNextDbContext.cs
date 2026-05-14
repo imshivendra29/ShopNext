@@ -17,6 +17,9 @@ namespace ShopNext.Data
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<Payment> Payments { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -41,6 +44,23 @@ namespace ShopNext.Data
                 .HasOne(p => p.CreatedByUser)
                 .WithMany()
                 .HasForeignKey(p => p.CreatedBy)
+                .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<OrderItem>()
+                 .HasOne(oi => oi.Order)
+                 .WithMany(o => o.OrderItems)
+                 .HasForeignKey(oi => oi.OrderId)
+                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<OrderItem>()
+                .HasOne(oi => oi.Product)
+                .WithMany()
+                .HasForeignKey(oi => oi.ProductId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Order)
+                .WithOne(o => o.Payment)
+                .HasForeignKey<Payment>(p => p.OrderId)
                 .OnDelete(DeleteBehavior.NoAction);
         }
 

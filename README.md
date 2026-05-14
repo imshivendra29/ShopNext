@@ -350,7 +350,25 @@ Users can manage their shopping cart with full CRUD operations.
 - Duplicate product check — quantity increases if already in cart
 
 
+## Order Module
 
+Users can place orders directly from their cart with COD or Online payment support.
+
+### Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/order/checkout` | Place order from cart | User |
+| GET | `/api/order/my-orders` | Get all my orders | User |
+| GET | `/api/order/{id}` | Get order detail | User |
+| PATCH | `/api/order/{id}/status` | Update order status | Admin only |
+
+### Tech Decisions
+- Order items and price snapshot taken from Cart at checkout time — price manipulation not possible from frontend
+- Cart auto-cleared after successful order
+- Payment record created automatically on checkout
+- COD and Online payment methods supported
+- Only Admin can update order status
 
 
 
@@ -364,7 +382,7 @@ Users can manage their shopping cart with full CRUD operations.
 - [x] Products Module
 - [x] Review Module (CRUD with duplicate protection)
 - [x] Cart Module
-- [ ] Orders Module
+- [x] Orders Module
 - [ ] PhonePe Payment Integration
 - [ ] Cloudinary Image Upload
 - [ ] Rate Limiting
