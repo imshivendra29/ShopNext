@@ -329,6 +329,31 @@ Users can post, update, and delete reviews on products.
 - Only owner can update or delete their review
 - Product AverageRating and ReviewCount auto-updated on review create
 - User loaded via EF Core Include for response
+
+## Cart Module
+
+Users can manage their shopping cart with full CRUD operations.
+
+### Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/cart` | Get user's cart | User |
+| POST | `/api/cart/add` | Add item to cart | User |
+| PUT | `/api/cart/update` | Update item quantity | User |
+| DELETE | `/api/cart/remove/{productId}` | Remove item from cart | User |
+| DELETE | `/api/cart/clear` | Clear entire cart | User |
+
+### Tech Decisions
+- Every user gets their own cart auto-created on first add
+- Grand total and per-item total calculated in service layer
+- Duplicate product check — quantity increases if already in cart
+
+
+
+
+
+
 ## Roadmap
 
 - [x] User Auth (Register / Login)
@@ -338,7 +363,7 @@ Users can post, update, and delete reviews on products.
 - [x] Category Module (CRUD)
 - [x] Products Module
 - [x] Review Module (CRUD with duplicate protection)
-- [] Cart Module
+- [x] Cart Module
 - [ ] Orders Module
 - [ ] PhonePe Payment Integration
 - [ ] Cloudinary Image Upload
