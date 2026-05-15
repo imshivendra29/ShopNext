@@ -7,10 +7,12 @@ namespace ShopNext.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _repo;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public UserService(IUserRepository repo)
+        public UserService(IUserRepository repo, ICloudinaryService cloudinaryService)
         {
             _repo = repo;
+            _cloudinaryService = cloudinaryService;
         }
         public async Task<UserProfileDto> GetProfileAsync(int userId)
         {
@@ -32,7 +34,12 @@ namespace ShopNext.Services
                 throw new AppException("User not found", 404);
 
             user.Name = dto.Name;
-            user.Email = dto.Email;
+            user.Phone = dto.Phone;
+            user.DateOfBirth = dto.DateOfBirth;
+
+            if (dto.ProfileImage != null)
+                user.ProfileImageUrl = await _cloudinaryService.UploadImageAsync(dto.ProfileImage, "shopnext/profiles");
+
             await _repo.UpdateUserAsync(user);
         }
 

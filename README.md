@@ -105,6 +105,10 @@ cp appsettings.example.json appsettings.json
     "Issuer": "ShopNest",
     "Audience": "ShopNestUsers"
   },
+  "Razorpay": {
+  "KeyId": "key add karo yha pr repo me mt push karna",
+  "KeySecret": "ye wala to bilkul nhi kyu order verification esi key se hoga "
+},
   "Cloudinary": {
     "CloudName": "addname",
     "ApiKey": "addkey",
@@ -402,22 +406,66 @@ All uploaded images are automatically:
 | PUT | `/api/category/{id}` | `Image` |
 
 > All image endpoints use `multipart/form-data`, not `application/json`.
+
+
+## User Profile Module / new change in user module-- read thiss
+
+Users can update their profile including phone number, date of birth, and profile picture.
+
+### Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/user/profile` | Get profile | User |
+| PUT | `/api/user/profile` | Update profile with image | User |
+| PATCH | `/api/user/change-password` | Change password | User |
+| DELETE | `/api/user/delete` | Delete account | User |
+
+### Tech Decisions
+- Profile image uploaded to Cloudinary — URL saved in Users table
+- Phone stored but verified at checkout time
+- IsPhoneVerified flag for future OTP implementation
+
+---
+
+## Address Module
+
+Users can manage multiple saved addresses with default address support.
+
+### Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/address` | Get all my addresses | User |
+| POST | `/api/address` | Add new address | User |
+| PUT | `/api/address/{id}` | Update address | User |
+| DELETE | `/api/address/{id}` | Delete address | User |
+| PATCH | `/api/address/{id}/default` | Set default address | User |
+
+### Tech Decisions
+- Multiple addresses per user supported
+- First address automatically set as default
+- Default address shown first in list
+- Only owner can modify their addresses
 ## Roadmap
 
 - [x] User Auth (Register / Login)
 - [x] JWT Authentication
-- [x] Profile CRUD
+- [x] User Profile (Update + Profile Image)
+- [x] Phone Verification Flag
+- [x] Address Module (CRUD + Default)
 - [x] Role-based Authorization
-- [x] Category Module (CRUD)
-- [x] Products Module
-- [x] Review Module (CRUD with duplicate protection)
-- [x] Cart Module
-- [x] Orders Module
-- [ ] PhonePe Payment Integration
-- [x] Cloudinary Image Upload
+- [x] Category Module (CRUD + Cloudinary)
+- [x] Products Module (CRUD + Cloudinary)
+- [x] Review Module (CRUD + Duplicate Protection)
+- [x] Cart Module (Add, Update, Remove, Clear)
+- [x] Order Module (Checkout, History, Status)
+- [x] Cloudinary Image Upload (Products + Categories + Profiles)
+- [ ] Razorpay Payment Integration
+- [ ] Phone OTP Verification
+- [ ] Search & Filter (Products)
 - [ ] Rate Limiting
-- [ ] OTP Verification
----
+- [ ] React Frontend---
 
 ## Author
 

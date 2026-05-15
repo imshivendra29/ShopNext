@@ -10,6 +10,7 @@ namespace ShopNext.Models
         public string PasswordHash { get; set; } = string.Empty;
         public string Role { get; set; } = "User";
         public string? Phone { get; set; }
+        public bool IsPhoneVerified { get; set; } = false;
         public string? ProfileImageUrl { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public bool IsActive { get; set; } = true;

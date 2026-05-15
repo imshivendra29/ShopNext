@@ -5,6 +5,7 @@ using ShopNext.DTOs.User;
 using ShopNext.Exceptions;
 using ShopNext.Services;
 
+
 namespace ShopNext.Controllers
 {
     [Authorize]
@@ -36,10 +37,11 @@ namespace ShopNext.Controllers
         }
 
         [HttpPut("profile")]
-        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto dto)
+        public async Task<IActionResult> UpdateProfile([FromForm] UpdateProfileDto dto)
         {
-            await _userService.UpdateProfileAsync(GetUserId(), dto);
-            return Ok(new { Message = "Profile updated" });
+            var userId = int.Parse(User.FindFirst("uid")!.Value);
+            await _userService.UpdateProfileAsync(userId, dto);
+            return Ok(new { message = "Profile updated" });
         }
 
         [HttpPatch("change-password")]
