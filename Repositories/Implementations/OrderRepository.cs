@@ -59,5 +59,25 @@ namespace ShopNext.Repositories.Implementations
             await _context.SaveChangesAsync();
             return order;
         }
+        public async Task UpdateRazorpayOrderIdAsync(int orderId, string razorpayOrderId)
+        {
+            var order = await _context.Orders.FindAsync(orderId);
+            if (order == null) return;
+
+            order.RazorpayOrderId = razorpayOrderId;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Payment?> GetPaymentByOrderIdAsync(int orderId)
+        {
+            return await _context.Payments
+                .FirstOrDefaultAsync(p => p.OrderId == orderId);
+        }
+
+        public async Task UpdatePaymentAsync(Payment payment)
+        {
+            _context.Payments.Update(payment);
+            await _context.SaveChangesAsync();
+        }
     }
 }

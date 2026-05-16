@@ -447,6 +447,77 @@ Users can manage multiple saved addresses with default address support.
 - First address automatically set as default
 - Default address shown first in list
 - Only owner can modify their addresses
+
+## Payment Module (Razorpay)
+
+Secure payment integration using Razorpay. Payment amount is always taken from the database — never from frontend, preventing price manipulation.
+
+### Flow
+### Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/payment/initiate/{orderId}` | Create Razorpay order | User |
+| POST | `/api/payment/verify` | Verify payment signature | User |
+
+### Tech Decisions
+- Amount fetched from DB — frontend cannot manipulate price
+- HMAC SHA256 signature verification — industry standard
+- Payment record auto-updated on success
+- COD orders blocked from payment initiation
+- Already paid orders blocked from re-initiation
+
+### Testing in Postman (without frontend)
+
+**Step 1 — Register/Login**
+```json
+POST /api/auth/login
+{
+  "email": "admin@shopnext.com",
+  "password": "Admin@123"
+}
+```
+Copy the JWT token from response.
+
+**Step 2 — Add to Cart**
+```json
+POST /api/cart/add
+Authorization: Bearer <token>
+{
+  "productId": 1,
+  "quantity": 2
+}
+```
+
+**Step 3 — Place Order**
+```json
+POST /api/order/checkout
+Authorization: Bearer <token>
+{
+  "shippingAddress": "123 Delhi, India",
+  "paymentMethod": "Online"
+}
+```
+Note the `id` from response.
+
+**Step 4 — Initiate Payment**
+
+Note the `razorpayOrderId` from response.
+
+**Step 5 — Verify Payment**
+```json
+POST /api/payment/verify
+Authorization: Bearer <token>
+{
+  "orderId": 4,
+  "razorpayOrderId": "order_xxx",
+  "razorpayPaymentId": "pay_xxx",
+  "razorpaySignature": "invalid_for_test"
+}
+```
+Expected: `"Invalid payment signature"` — correct behavior without real frontend.
+
+
 ## Roadmap
 
 - [x] User Auth (Register / Login)
@@ -461,8 +532,8 @@ Users can manage multiple saved addresses with default address support.
 - [x] Cart Module (Add, Update, Remove, Clear)
 - [x] Order Module (Checkout, History, Status)
 - [x] Cloudinary Image Upload (Products + Categories + Profiles)
-- [ ] Razorpay Payment Integration
-- [ ] Phone OTP Verification
+- [x] Razorpay Payment Integration (Initiate + Verify + Signature Validation)
+- [ ] - [ ] Phone OTP Verification
 - [ ] Search & Filter (Products)
 - [ ] Rate Limiting
 - [ ] React Frontend---

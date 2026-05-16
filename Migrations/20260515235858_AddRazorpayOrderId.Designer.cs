@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShopNext.Data;
 
@@ -11,9 +12,11 @@ using ShopNext.Data;
 namespace ShopNext.Migrations
 {
     [DbContext(typeof(ShopNextDbContext))]
-    partial class ShopNextDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260515235858_AddRazorpayOrderId")]
+    partial class AddRazorpayOrderId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

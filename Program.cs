@@ -7,6 +7,8 @@ using ShopNext.Middleware;
 using ShopNext.Repositories.Implementations;
 using ShopNext.Repositories.Interfaces;
 using ShopNext.Services;
+using ShopNext.Services.Implementations;
+using ShopNext.Services.Interfaces;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +40,9 @@ builder.Services.AddScoped<IAddressService, AddressService>();
 
 //cloudanry- maybe spelling mistake but I am not sure
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+// razorpay seervice add 
+builder.Services.AddScoped<IRazorpayService, RazorpayService>();
+///
 builder.Services.AddScoped<JwtHelper>();
 builder.Services.AddDbContext<ShopNextDbContext>(options =>
     options.UseSqlServer(

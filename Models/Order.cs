@@ -5,6 +5,7 @@ namespace ShopNext.Models
     {
         public int Id { get; set; }
         public int UserId { get; set; }
+        public string? RazorpayOrderId { get; set; }
         public string ShippingAddress { get; set; } = string.Empty;
         public decimal TotalAmount { get; set; }
         public string Status { get; set; } = "Pending";

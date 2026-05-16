@@ -9,5 +9,8 @@ namespace ShopNext.Repositories.Interfaces
         Task<List<Order>> GetUserOrdersAsync(int userId);
         Task<Order?> UpdateStatusAsync(int id, string status);
         Task<Order?> UpdatePaymentStatusAsync(int id, string paymentStatus);
+        Task UpdateRazorpayOrderIdAsync(int orderId, string razorpayOrderId);
+        Task<Payment?> GetPaymentByOrderIdAsync(int orderId);
+        Task UpdatePaymentAsync(Payment payment);
     }
 }
