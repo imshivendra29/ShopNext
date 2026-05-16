@@ -1,6 +1,7 @@
 ﻿using ShopNext.DTOs.Order;
 using ShopNext.Exceptions;
 using ShopNext.Models;
+using ShopNext.Repositories.Implementations;
 using ShopNext.Repositories.Interfaces;
 
 namespace ShopNext.Services
@@ -9,16 +10,25 @@ namespace ShopNext.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly ICartRepository _cartRepository;
+        private readonly IUserRepository _userRepository;
 
-        public OrderService(IOrderRepository orderRepository, ICartRepository cartRepository)
+        public OrderService(IOrderRepository orderRepository, ICartRepository cartRepository, IUserRepository userRepository)
         {
             _orderRepository = orderRepository;
             _cartRepository = cartRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<OrderResponseDto> PlaceOrderAsync(int userId, PlaceOrderDto dto)
         {
             // Cart fetch user need to fatch in server side because user can manipulate client side data
+            var user = await _userRepository.GetByIdAsync(userId);
+
+            if (user.Phone == null)
+                throw new AppException("Please add phone number before ordering", 400);
+
+            if (!user.IsPhoneVerified)
+                throw new AppException("Please verify your phone number before ordering", 400);
             var cart = await _cartRepository.GetCartByUserIdAsync(userId);
             if (cart == null || !cart.CartItems.Any())
                 throw new AppException("Cart is empty", 400);

@@ -14,7 +14,43 @@ namespace ShopNext.Services
             _repository = repository;
             _cloudinaryService = cloudinaryService;
         }
+        public async Task<ProductSearchResponseDto> SearchAsync(ProductSearchDto dto)
+        {
+            if (dto.PageSize > 50) dto.PageSize = 50;
 
+            var (products, totalCount) = await _repository.SearchAsync(
+                dto.Keyword,
+                dto.CategoryId,
+                dto.MinPrice,
+                dto.MaxPrice,
+                dto.SortBy,
+                dto.Page,
+                dto.PageSize);
+
+            var totalPages = (int)Math.Ceiling((double)totalCount / dto.PageSize);
+
+            return new ProductSearchResponseDto
+            {
+                TotalItems = totalCount,
+                TotalPages = totalPages,
+                CurrentPage = dto.Page,
+                PageSize = dto.PageSize,
+                Products = products.Select(p => new ProductResponseDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    Price = p.Price,
+                    Stock = p.Stock,
+                    ImageUrl = p.ImageUrl,
+                    AverageRating = p.AverageRating,
+                    ReviewCount = p.ReviewCount,
+                    IsActive = p.IsActive,
+                    DateCreated = p.DateCreated,
+                    CategoryName = p.Category.Name
+                }).ToList()
+            };
+        }
         public async Task<List<ProductResponseDto>> GetAllAsync()
         {
             var products = await _repository.GetAllAsync();

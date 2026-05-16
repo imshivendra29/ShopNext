@@ -517,6 +517,34 @@ Authorization: Bearer <token>
 ```
 Expected: `"Invalid payment signature"` — correct behavior without real frontend.
 
+## Search & Filter Module
+
+Products can be searched and filtered with pagination support.
+
+### Endpoint
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/product/search` | Search and filter products | No |
+
+### Query Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| keyword | string | Search in name and description |
+| categoryId | int | Filter by category |
+| minPrice | decimal | Minimum price filter |
+| maxPrice | decimal | Maximum price filter |
+| sortBy | string | price_asc, price_desc, rating, reviews, newest |
+| page | int | Page number (default: 1) |
+| pageSize | int | Items per page (default: 10, max: 50) |
+
+### Tech Decisions
+- Deferred execution — single optimized SQL query
+- PageSize capped at 50 — prevents server overload
+- Debounce recommended on frontend — 300ms delay
+
+
 
 ## Roadmap
 
@@ -534,7 +562,7 @@ Expected: `"Invalid payment signature"` — correct behavior without real fronte
 - [x] Cloudinary Image Upload (Products + Categories + Profiles)
 - [x] Razorpay Payment Integration (Initiate + Verify + Signature Validation)
 - [ ] - [ ] Phone OTP Verification
-- [ ] Search & Filter (Products)
+- [x] Search & Filter (Keyword, Category, Price, Sort, Pagination)
 - [ ] Rate Limiting
 - [ ] React Frontend---
 

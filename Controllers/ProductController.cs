@@ -58,5 +58,11 @@ namespace ShopNext.Controllers
             if (!result) return NotFound(new { message = "Product not found" });
             return Ok(new { message = "Product deleted" });
         }
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] ProductSearchDto dto)
+        {
+            var result = await _service.SearchAsync(dto);
+            return Ok(result);
+        }
     }
 }

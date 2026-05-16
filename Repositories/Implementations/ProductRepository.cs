@@ -12,7 +12,53 @@ namespace ShopNext.Repositories.Implementations
         {
             _context = context;
         }
+        public async Task<(List<Product> Products, int TotalCount)> SearchAsync(
+ string? keyword,
+ int? categoryId,
+ decimal? minPrice,
+ decimal? maxPrice,
+ string? sortBy,
+ int page,
+ int pageSize)
+        {
+            var query = _context.Products
+                .Include(p => p.Category)
+                .Where(p => p.IsActive);
 
+            if (!string.IsNullOrEmpty(keyword))
+                query = query.Where(p => p.Name.Contains(keyword) ||
+                                         p.Description.Contains(keyword));
+
+            if (categoryId.HasValue)
+                query = query.Where(p => p.CategoryId == categoryId);
+
+            if (minPrice.HasValue)
+                query = query.Where(p => p.Price >= minPrice);
+
+            if (maxPrice.HasValue)
+                query = query.Where(p => p.Price <= maxPrice);
+
+            query = sortBy switch
+            {
+                "price_asc" => query.OrderBy(p => p.Price),
+                "price_desc" => query.OrderByDescending(p => p.Price),
+                "rating" => query.OrderByDescending(p => p.AverageRating),
+                "reviews" => query.OrderByDescending(p => p.ReviewCount),
+                "newest" => query.OrderByDescending(p => p.DateCreated),
+                _ => query.OrderByDescending(p => p.DateCreated)
+            };
+
+
+            var totalCount = await query.CountAsync();
+
+
+            var products = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (products, totalCount);
+        }
         public async Task<List<Product>> GetAllAsync()
         {
             return await _context.Products
@@ -56,7 +102,7 @@ namespace ShopNext.Repositories.Implementations
             await _context.SaveChangesAsync();
             return existing;
         }
-
+     
         public async Task<bool> DeleteAsync(int id)
         {
             var existing = await _context.Products.FindAsync(id);
