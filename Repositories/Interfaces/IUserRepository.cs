@@ -9,5 +9,6 @@ namespace ShopNext.Repositories.Interfaces
         Task<User?> GetByIdAsync(int id);
         Task UpdateUserAsync(User user);
         Task DeleteUserAsync(User user);
+        Task<User?> GetByPhoneAsync(string phone);
     }
 }

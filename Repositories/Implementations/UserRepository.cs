@@ -33,7 +33,11 @@ namespace ShopNext.Repositories.Implementations
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }
-
+        public async Task<User?> GetByPhoneAsync(string phone)
+        {
+            return await _context.Users
+                .FirstOrDefaultAsync(u => u.Phone == phone);
+        }
         public async Task DeleteUserAsync(User user)
         {
             _context.Users.Remove(user);

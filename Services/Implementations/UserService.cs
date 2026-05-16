@@ -29,16 +29,28 @@ namespace ShopNext.Services
         }
         public async Task UpdateProfileAsync(int userId, UpdateProfileDto dto)
         {
+            if (dto == null)
+                throw new AppException("Invalid profile data", 400);
+
             var user = await _repo.GetByIdAsync(userId);
             if (user == null)
                 throw new AppException("User not found", 404);
 
-            user.Name = dto.Name;
-            user.Phone = dto.Phone;
-            user.DateOfBirth = dto.DateOfBirth;
+            if (!string.IsNullOrEmpty(dto.Name))
+                user.Name = dto.Name;
+
+            if (dto.DateOfBirth.HasValue)
+                user.DateOfBirth = dto.DateOfBirth;
+
+            if (!string.IsNullOrEmpty(dto.Phone) && dto.Phone != user.Phone)
+            {
+                user.Phone = dto.Phone;
+                user.IsPhoneVerified = false;
+            }
 
             if (dto.ProfileImage != null)
-                user.ProfileImageUrl = await _cloudinaryService.UploadImageAsync(dto.ProfileImage, "shopnext/profiles");
+                user.ProfileImageUrl = await _cloudinaryService
+                    .UploadImageAsync(dto.ProfileImage, "shopnext/profiles");
 
             await _repo.UpdateUserAsync(user);
         }

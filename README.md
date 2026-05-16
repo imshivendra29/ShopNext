@@ -105,6 +105,9 @@ cp appsettings.example.json appsettings.json
     "Issuer": "ShopNest",
     "Audience": "ShopNestUsers"
   },
+  "Fast2SMS": {
+    "ApiKey": "key"
+  },
   "Razorpay": {
   "KeyId": "key add karo yha pr repo me mt push karna",
   "KeySecret": "ye wala to bilkul nhi kyu order verification esi key se hoga "
@@ -544,6 +547,37 @@ Products can be searched and filtered with pagination support.
 - PageSize capped at 50 — prevents server overload
 - Debounce recommended on frontend — 300ms delay
 
+## OTP Verification Module
+
+Phone number verification using OTP before order placement.
+
+### Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/otp/send` | Send OTP to registered phone | User |
+| POST | `/api/otp/verify` | Verify OTP | User |
+
+### Security
+- 1 minute cooldown between OTP requests
+- Max 5 requests per hour per phone
+- 3 wrong attempts → 15 minute block
+- OTP stored as BCrypt hash — never plain text
+- OTP expires in 5 minutes
+- One-time use only
+
+### Tech Decisions
+- Phone number taken from JWT — not from request body
+- IsPhoneVerified flag updated on successful verification
+- Phone change resets verification status
+- SMS provider: Console mode (development) — MSG91 recommended for production
+
+### Order Checkout Protection
+- Phone number required before order
+- Phone must be verified before order
+- Unverified users get 400 error at checkout
+
+
 
 
 ## Roadmap
@@ -561,10 +595,12 @@ Products can be searched and filtered with pagination support.
 - [x] Order Module (Checkout, History, Status)
 - [x] Cloudinary Image Upload (Products + Categories + Profiles)
 - [x] Razorpay Payment Integration (Initiate + Verify + Signature Validation)
-- [ ] - [ ] Phone OTP Verification
 - [x] Search & Filter (Keyword, Category, Price, Sort, Pagination)
-- [ ] Rate Limiting
-- [ ] React Frontend---
+- [x] OTP Verification (Rate Limited + BCrypt hashed)
+- [x] Phone Verification at Checkout
+- [ ] Rate Limiting ------ > Implement global rate limiting to prevent abuse (e.g. 100 requests per minute per IP)
+- [ ] Admin Dashboard (ASP.NET Core MVC or Blazor) for managing products, categories, orders/ 
+- [ ] React Frontend--- 
 
 ## Author
 

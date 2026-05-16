@@ -42,7 +42,11 @@ builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 // razorpay seervice add 
 builder.Services.AddScoped<IRazorpayService, RazorpayService>();
-///
+//opt
+builder.Services.AddScoped<IOtpRepository, OtpRepository>();
+builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddHttpClient<OtpService>();
+
 builder.Services.AddScoped<JwtHelper>();
 builder.Services.AddDbContext<ShopNextDbContext>(options =>
     options.UseSqlServer(
