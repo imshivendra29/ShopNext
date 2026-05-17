@@ -577,7 +577,30 @@ Phone number verification using OTP before order placement.
 - Phone must be verified before order
 - Unverified users get 400 error at checkout
 
+## Banner Module
 
+Homepage promotional banners for the storefront. Admin can upload banner images, and frontend displays them in an auto-sliding carousel.
+
+### Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/banner` | Get all active banners | No |
+| POST | `/api/banner` | Upload new banner image | Admin only |
+| DELETE | `/api/banner/{id}` | Soft delete banner | Admin only |
+
+### Tech Decisions
+
+- Banner images uploaded to :contentReference[oaicite:0]{index=0} via backend
+- Only active banners shown on frontend
+- Soft delete using `IsActive = false`
+- Used for homepage auto-slider
+
+### Model
+
+- Id
+- ImageUrl
+- IsActive
 
 
 ## Roadmap
