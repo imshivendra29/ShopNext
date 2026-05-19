@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.IdentityModel.Tokens;
 using ShopNext.Data;
 using ShopNext.Helpers;
@@ -11,77 +10,83 @@ using ShopNext.Services.Implementations;
 using ShopNext.Services.Interfaces;
 using System.Text;
 
-
-
 var builder = WebApplication.CreateBuilder(args);
-// Program.cs mein — sabse upar add karo
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-builder.WebHost.UseUrls($"http://*:{port}");
+
+//PORT CONFIG
+
+// Render ke liye
+var port = Environment.GetEnvironmentVariable("PORT");
+
+if (!string.IsNullOrEmpty(port))
+{
+    builder.WebHost.UseUrls($"http://*:{port}");
+}
+
+//
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+        policy
+            .WithOrigins(
+                "http://localhost:5173"
+            // 
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
-// Add services to the container.
+
+//SERVICES
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-//auth
 builder.Services.AddScoped<IAuthService, AuthService>();
-// user
+
 builder.Services.AddScoped<IUserService, UserService>();
-// category
+
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-// product
+
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
-//review
+
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
-//cart
+
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
-//order
+
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-//address
+
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 
-//cloudanry- maybe spelling mistake but I am not sure
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
-// razorpay seervice add 
+
 builder.Services.AddScoped<IRazorpayService, RazorpayService>();
-//opt
+
 builder.Services.AddScoped<IOtpRepository, OtpRepository>();
 builder.Services.AddScoped<IOtpService, OtpService>();
+
 builder.Services.AddHttpClient<OtpService>();
-//banner
+
 builder.Services.AddScoped<IBannerRepository, BannerRepository>();
 builder.Services.AddScoped<IBannerService, BannerService>();
 
-
 builder.Services.AddScoped<JwtHelper>();
-//addd database 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-if (builder.Environment.IsProduction())
-{
-    builder.Services.AddDbContext<ShopNextDbContext>(options =>
-        options.UseMySql(
-            connectionString,
-            ServerVersion.AutoDetect(connectionString)
-        ));
-}
-else
-{
-    builder.Services.AddDbContext<ShopNextDbContext>(options =>
-        options.UseSqlServer(connectionString));
-}
+// DATABASE
+
+builder.Services.AddDbContext<ShopNextDbContext>(options =>
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    ));
+
+//JWT
+
 builder.Services.AddAuthentication("Bearer")
 .AddJwtBearer("Bearer", options =>
 {
@@ -97,13 +102,14 @@ builder.Services.AddAuthentication("Bearer")
             ValidAudience = builder.Configuration["Jwt:Audience"],
 
             IssuerSigningKey = new SymmetricSecurityKey(
-    Encoding.UTF8.GetBytes(
-        builder.Configuration["Jwt:Key"] 
-        ?? throw new InvalidOperationException("Jwt:Key is not configured")
-    )
-)
+                Encoding.UTF8.GetBytes(
+                    builder.Configuration["Jwt:Key"]
+                    ?? throw new InvalidOperationException("Jwt:Key missing")
+                )
+            )
         };
 });
+
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -111,11 +117,31 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsProduction())
+//SWAGGER
+
+// 
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+
+if (app.Environment.IsProduction())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+//
+
+//
+if (app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
+
+//PIPELINE
 
 app.MapGet("/", () => "ShopNest API Running...");
 
@@ -129,4 +155,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
