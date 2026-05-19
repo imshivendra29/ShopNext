@@ -66,11 +66,22 @@ builder.Services.AddScoped<IBannerService, BannerService>();
 
 
 builder.Services.AddScoped<JwtHelper>();
-builder.Services.AddDbContext<ShopNextDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    )
-);
+//addd database 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (builder.Environment.IsProduction())
+{
+    builder.Services.AddDbContext<ShopNextDbContext>(options =>
+        options.UseMySql(
+            connectionString,
+            ServerVersion.AutoDetect(connectionString)
+        ));
+}
+else
+{
+    builder.Services.AddDbContext<ShopNextDbContext>(options =>
+        options.UseSqlServer(connectionString));
+}
 builder.Services.AddAuthentication("Bearer")
 .AddJwtBearer("Bearer", options =>
 {
@@ -101,17 +112,21 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsProduction())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
+app.MapGet("/", () => "ShopNest API Running...");
+
 app.UseCors("AllowFrontend");
+
 app.UseMiddleware<ErrorHandlingMiddleware>();
-app.UseAuthentication();  
+
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();
+
