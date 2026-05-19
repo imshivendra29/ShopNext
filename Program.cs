@@ -11,8 +11,12 @@ using ShopNext.Services.Implementations;
 using ShopNext.Services.Interfaces;
 using System.Text;
 
-var builder = WebApplication.CreateBuilder(args);
 
+
+var builder = WebApplication.CreateBuilder(args);
+// Program.cs mein — sabse upar add karo
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://*:{port}");
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
