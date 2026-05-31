@@ -44,7 +44,8 @@ namespace ShopNext.Services
                 user.Name = dto.Name;
 
             if (!string.IsNullOrEmpty(dto.DateOfBirth))
-                user.DateOfBirth = DateTime.Parse(dto.DateOfBirth);
+                user.DateOfBirth = DateTime.Parse(dto.DateOfBirth,
+                    System.Globalization.CultureInfo.InvariantCulture);
 
             if (!string.IsNullOrEmpty(dto.Phone) && dto.Phone != user.Phone)
             {
