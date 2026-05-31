@@ -24,7 +24,11 @@ namespace ShopNext.Services
             {
                 Name = user.Name,
                 Email = user.Email,
-                Role = user.Role
+                Role = user.Role,
+                Phone = user.Phone,
+                DateOfBirth = user.DateOfBirth,
+                ProfileImageUrl = user.ProfileImageUrl,
+
             };
         }
         public async Task UpdateProfileAsync(int userId, UpdateProfileDto dto)
