@@ -147,9 +147,11 @@ app.MapGet("/", () => "ShopNest API Running...");
 
 app.UseCors("AllowFrontend");
 
+app.UseRateLimiter();
+
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
-app.UseRateLimiter();
+
 
 app.UseAuthentication();
 app.UseAuthorization();
