@@ -11,5 +11,6 @@ namespace ShopNext.Services
         Task<ProductResponseDto?> UpdateAsync(int id, UpdateProductDto dto);
         Task<bool> DeleteAsync(int id);
         Task<ProductSearchResponseDto> SearchAsync(ProductSearchDto dto);
+        
     }
 }

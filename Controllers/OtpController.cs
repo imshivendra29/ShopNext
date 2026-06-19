@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ShopNext.Services.Interfaces;
-using ShopNext.Repositories.Interfaces;
+using Microsoft.AspNetCore.RateLimiting;
+using ShopNext.Constants;
 using ShopNext.DTOs.Otp;
+using ShopNext.Repositories.Interfaces;
+using ShopNext.Services.Interfaces;
 
 namespace ShopNext.Controllers
 {
@@ -19,6 +21,7 @@ namespace ShopNext.Controllers
             _service = service;
             _userRepository = userRepository;
         }
+        [EnableRateLimiting(RateLimitPolicies.Otp)]
         [HttpPost("send")]
         public async Task<IActionResult> SendOtp()
         {

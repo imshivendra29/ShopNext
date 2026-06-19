@@ -143,7 +143,9 @@ namespace ShopNext.Services.Implementations
             var responseBody = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
-                throw new AppException($"Failed to send OTP. Please try again.", 500);
+                // throw new AppException($"Failed to send OTP. Please try again.", 500);
+                // for testing
+                throw new AppException($"SMS failed: {responseBody}", 500);
         }
     }
 }

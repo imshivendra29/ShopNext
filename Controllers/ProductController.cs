@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using ShopNext.Constants;
 using ShopNext.DTOs.Product;
 using ShopNext.Services;
 
@@ -16,7 +18,6 @@ namespace ShopNext.Controllers
         {
             _service = service;
         }
-
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -58,6 +59,7 @@ namespace ShopNext.Controllers
             if (!result) return NotFound(new { message = "Product not found" });
             return Ok(new { message = "Product deleted" });
         }
+        [EnableRateLimiting(RateLimitPolicies.Search)]
         [HttpGet("search")]
         public async Task<IActionResult> Search([FromQuery] ProductSearchDto dto)
         {

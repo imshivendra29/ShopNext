@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ShopNext.Data;
+using ShopNext.Extensions;
 using ShopNext.Helpers;
 using ShopNext.Middleware;
 using ShopNext.Repositories.Implementations;
@@ -12,6 +14,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 //PORT CONFIG
 
 // Render ke liye
@@ -22,7 +25,12 @@ if (!string.IsNullOrEmpty(port))
     builder.WebHost.UseUrls($"http://*:{port}");
 }
 
-//
+// for rander proxy rander ke liye
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 builder.Services.AddCors(options =>
 {
@@ -110,45 +118,38 @@ builder.Services.AddAuthentication("Bearer")
             )
         };
 });
-
 builder.Services.AddControllers();
+builder.Services.AddShopNextRateLimiter();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-//SWAGGER
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+                       ForwardedHeaders.XForwardedProto
+});
 
-// 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-
-if (app.Environment.IsProduction())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-//
-
-//
 if (app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
-
-//PIPELINE
 
 app.MapGet("/", () => "ShopNest API Running...");
 
 app.UseCors("AllowFrontend");
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();

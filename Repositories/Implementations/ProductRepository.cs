@@ -107,7 +107,6 @@ namespace ShopNext.Repositories.Implementations
         {
             var existing = await _context.Products.FindAsync(id);
             if (existing == null) return false;
-
             _context.Products.Remove(existing);
             await _context.SaveChangesAsync();
             return true;

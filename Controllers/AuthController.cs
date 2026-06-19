@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using ShopNext.Constants;
 using ShopNext.DTOs.Auth;
 using ShopNext.Services;
 
@@ -24,6 +26,7 @@ namespace ShopNext.Controllers
                 return Ok(new { Token = token });
            
         }
+        [EnableRateLimiting(RateLimitPolicies.Login)]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
