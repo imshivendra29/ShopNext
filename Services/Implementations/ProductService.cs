@@ -1,5 +1,6 @@
 ﻿using ShopNext.DTOs.Product;
 using ShopNext.Infrastructure.Cloudinary.Interfaces;
+using ShopNext.Infrastructure.Redis;
 using ShopNext.Models;
 using ShopNext.Repositories.Interfaces;
 
@@ -9,15 +10,33 @@ namespace ShopNext.Services
     {
         private readonly IProductRepository _repository;
         private readonly ICloudinaryService _cloudinaryService;
+        private readonly IRedisCacheService _cache;
 
-        public ProductService(IProductRepository repository, ICloudinaryService cloudinaryService)
+        public ProductService(
+            IProductRepository repository,
+            ICloudinaryService cloudinaryService,
+            IRedisCacheService cache)
         {
             _repository = repository;
             _cloudinaryService = cloudinaryService;
+            _cache = cache;
         }
+
         public async Task<ProductSearchResponseDto> SearchAsync(ProductSearchDto dto)
         {
             if (dto.PageSize > 50) dto.PageSize = 50;
+
+            var cacheKey = RedisKeys.ProductSearch(
+                dto.Keyword,
+                dto.CategoryId,
+                dto.MinPrice,
+                dto.MaxPrice,
+                dto.SortBy,
+                dto.Page,
+                dto.PageSize);
+
+            var cached = await _cache.GetAsync<ProductSearchResponseDto>(cacheKey);
+            if (cached is not null) return cached;
 
             var (products, totalCount) = await _repository.SearchAsync(
                 dto.Keyword,
@@ -28,73 +47,51 @@ namespace ShopNext.Services
                 dto.Page,
                 dto.PageSize);
 
-            var totalPages = (int)Math.Ceiling((double)totalCount / dto.PageSize);
-
-            return new ProductSearchResponseDto
+            var result = new ProductSearchResponseDto
             {
                 TotalItems = totalCount,
-                TotalPages = totalPages,
+                TotalPages = (int)Math.Ceiling((double)totalCount / dto.PageSize),
                 CurrentPage = dto.Page,
                 PageSize = dto.PageSize,
-                Products = products.Select(p => new ProductResponseDto
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Description = p.Description,
-                    Price = p.Price,
-                    Stock = p.Stock,
-                    ImageUrl = p.ImageUrl,
-                    AverageRating = p.AverageRating,
-                    ReviewCount = p.ReviewCount,
-                    IsActive = p.IsActive,
-                    DateCreated = p.DateCreated,
-                    CategoryName = p.Category.Name
-                }).ToList()
+                Products = products.Select(MapToResponse).ToList()
             };
+
+            await _cache.SetAsync(cacheKey, result, TimeSpan.FromMinutes(2));
+            return result;
         }
+
         public async Task<List<ProductResponseDto>> GetAllAsync()
         {
+            var cached = await _cache.GetAsync<List<ProductResponseDto>>(RedisKeys.AllProducts);
+            if (cached is not null) return cached;
+
             var products = await _repository.GetAllAsync();
-            return products.Select(p => new ProductResponseDto
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Description = p.Description,
-                Price = p.Price,
-                Stock = p.Stock,
-                ImageUrl = p.ImageUrl,
-                AverageRating = p.AverageRating,
-                ReviewCount = p.ReviewCount,
-                IsActive = p.IsActive,
-                DateCreated = p.DateCreated,
-                CategoryName = p.Category.Name
-            }).ToList();
+            var result = products.Select(MapToResponse).ToList();
+
+            await _cache.SetAsync(RedisKeys.AllProducts, result, TimeSpan.FromMinutes(5));
+            return result;
         }
 
         public async Task<ProductResponseDto?> GetByIdAsync(int id)
         {
+            var cacheKey = RedisKeys.Product(id);
+
+            var cached = await _cache.GetAsync<ProductResponseDto>(cacheKey);
+            if (cached is not null) return cached;
+
             var product = await _repository.GetByIdAsync(id);
             if (product == null) return null;
 
-            return new ProductResponseDto
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                Stock = product.Stock,
-                ImageUrl = product.ImageUrl,
-                AverageRating = product.AverageRating,
-                ReviewCount = product.ReviewCount,
-                IsActive = product.IsActive,
-                DateCreated = product.DateCreated,
-                CategoryName = product.Category.Name
-            };
+            var result = MapToResponse(product);
+
+            await _cache.SetAsync(cacheKey, result, TimeSpan.FromMinutes(5));
+            return result;
         }
 
         public async Task<ProductResponseDto> CreateAsync(CreateProductDto dto, int adminId)
         {
             string? imageUrl = null;
+
             if (dto.Image != null)
                 imageUrl = await _cloudinaryService.UploadImageAsync(dto.Image, "shopnext/products");
 
@@ -111,24 +108,15 @@ namespace ShopNext.Services
 
             var created = await _repository.CreateAsync(product);
 
-            return new ProductResponseDto
-            {
-                Id = created.Id,
-                Name = created.Name,
-                Description = created.Description,
-                Price = created.Price,
-                Stock = created.Stock,
-                ImageUrl = created.ImageUrl,
-                AverageRating = created.AverageRating,
-                ReviewCount = created.ReviewCount,
-                IsActive = created.IsActive,
-                DateCreated = created.DateCreated,
-                CategoryName = created.Category.Name
-            };
+            await InvalidateProductCaches();
+
+            return MapToResponse(created);
         }
+
         public async Task<ProductResponseDto?> UpdateAsync(int id, UpdateProductDto dto)
         {
             string? imageUrl = null;
+
             if (dto.Image != null)
                 imageUrl = await _cloudinaryService.UploadImageAsync(dto.Image, "shopnext/products");
 
@@ -146,25 +134,44 @@ namespace ShopNext.Services
             var updated = await _repository.UpdateAsync(id, product);
             if (updated == null) return null;
 
-            return new ProductResponseDto
-            {
-                Id = updated.Id,
-                Name = updated.Name,
-                Description = updated.Description,
-                Price = updated.Price,
-                Stock = updated.Stock,
-                ImageUrl = updated.ImageUrl,
-                AverageRating = updated.AverageRating,
-                ReviewCount = updated.ReviewCount,
-                IsActive = updated.IsActive,
-                DateCreated = updated.DateCreated,
-                CategoryName = updated.Category.Name
-            };
+            await InvalidateProductCaches(id);
+
+            return MapToResponse(updated);
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            return await _repository.DeleteAsync(id);
+            var result = await _repository.DeleteAsync(id);
+
+            if (result)
+                await InvalidateProductCaches(id);
+
+            return result;
         }
+
+        private async Task InvalidateProductCaches(int? id = null)
+        {
+            await _cache.DeleteAsync(RedisKeys.AllProducts);
+
+            if (id.HasValue)
+                await _cache.DeleteAsync(RedisKeys.Product(id.Value));
+
+            // Search cache 
+        }
+
+        private static ProductResponseDto MapToResponse(Product p) => new()
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Description = p.Description,
+            Price = p.Price,
+            Stock = p.Stock,
+            ImageUrl = p.ImageUrl,
+            AverageRating = p.AverageRating,
+            ReviewCount = p.ReviewCount,
+            IsActive = p.IsActive,
+            DateCreated = p.DateCreated,
+            CategoryName = p.Category != null ? p.Category.Name : string.Empty
+        };
     }
 }

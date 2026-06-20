@@ -108,6 +108,10 @@ cp appsettings.example.json appsettings.json
   "Fast2SMS": {
     "ApiKey": "key"
   },
+  "Redis": {
+    "ConnectionString": "connection string dalo yha pr ",
+    "DefaultTtlMinutes": 5
+  },
   "Razorpay": {
   "KeyId": "key add karo yha pr repo me mt push karna",
   "KeySecret": "ye wala to bilkul nhi kyu order verification esi key se hoga "

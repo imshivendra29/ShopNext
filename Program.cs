@@ -1,3 +1,5 @@
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -7,15 +9,20 @@ using ShopNext.Helpers;
 using ShopNext.Infrastructure.Cloudinary.Interfaces;
 using ShopNext.Infrastructure.Payment.Implementations;
 using ShopNext.Infrastructure.Payment.Interfaces;
+using ShopNext.Infrastructure.Redis;
 using ShopNext.Middleware;
 using ShopNext.Repositories.Implementations;
 using ShopNext.Repositories.Interfaces;
 using ShopNext.Services;
 using ShopNext.Services.Implementations;
 using ShopNext.Services.Interfaces;
+using StackExchange.Redis;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+//check helth
 
 // Render ke liye
 var port = Environment.GetEnvironmentVariable("PORT");
@@ -93,7 +100,18 @@ builder.Services.AddDbContext<ShopNextDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
+// radis 
 
+builder.Services.Configure<RedisOptions>(
+    builder.Configuration.GetSection(RedisOptions.SectionName));
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    ConnectionMultiplexer.Connect(
+        builder.Configuration["Redis:ConnectionString"]!));
+
+builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
+
+//done
 //JWT
 
 builder.Services.AddAuthentication("Bearer")
@@ -123,15 +141,25 @@ builder.Services.AddShopNextRateLimiter();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+//for db helth check
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddHealthChecks()
+    .AddNpgSql(connectionString, name: "postgres");
 
+//build
 var app = builder.Build();
-
+//helth chekk
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+//for rander proxy rander ke liye
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor |
                        ForwardedHeaders.XForwardedProto
 });
-
+// swagger on proud
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
@@ -142,7 +170,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
-
+// pipeline configuration
 app.MapGet("/", () => "ShopNest API Running...");
 
 app.UseCors("AllowFrontend");
