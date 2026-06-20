@@ -106,8 +106,13 @@ builder.Services.Configure<RedisOptions>(
     builder.Configuration.GetSection(RedisOptions.SectionName));
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
-    ConnectionMultiplexer.Connect(
-        builder.Configuration["Redis:ConnectionString"]!));
+{
+    var redisConnection =
+        Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")
+        ?? builder.Configuration["Redis:ConnectionString"];
+
+    return ConnectionMultiplexer.Connect(redisConnection!);
+});
 
 builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
 
@@ -146,9 +151,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddHealthChecks()
     .AddNpgSql(connectionString, name: "postgres");
 // add connection string radis 
-var redisConnection =
-    Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")
-    ?? builder.Configuration["Redis:ConnectionString"];
+
 //build
 var app = builder.Build();
 //helth chekk
