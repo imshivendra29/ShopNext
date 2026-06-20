@@ -14,9 +14,6 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-//PORT CONFIG
-
 // Render ke liye
 var port = Environment.GetEnvironmentVariable("PORT");
 
@@ -150,9 +147,6 @@ app.UseCors("AllowFrontend");
 app.UseRateLimiter();
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
-
-
-
 app.UseAuthentication();
 app.UseAuthorization();
 

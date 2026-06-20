@@ -8,5 +8,6 @@ namespace ShopNext.Services
         Task<OrderResponseDto?> GetOrderByIdAsync(int id, int userId);
         Task<List<OrderResponseDto>> GetUserOrdersAsync(int userId);
         Task<OrderResponseDto?> UpdateStatusAsync(int id, string status);
+
     }
 }

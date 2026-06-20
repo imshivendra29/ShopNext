@@ -64,5 +64,10 @@ namespace ShopNext.Repositories.Implementations
             await _context.SaveChangesAsync();
             return review;
         }
+        public async Task<Review?> GetByIdAsync(int id, int userId)
+        {
+            return await _context.Reviews
+                .FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
+        }
     }
 }

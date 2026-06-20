@@ -12,5 +12,7 @@ namespace ShopNext.Repositories.Interfaces
         Task UpdateRazorpayOrderIdAsync(int orderId, string razorpayOrderId);
         Task<Payment?> GetPaymentByOrderIdAsync(int orderId);
         Task UpdatePaymentAsync(Payment payment);
+        Task<bool> HasUserPurchasedProductAsync(int userId, int productId);
+
     }
 }

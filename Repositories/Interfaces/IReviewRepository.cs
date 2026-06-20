@@ -8,5 +8,7 @@ namespace ShopNext.Repositories.Interfaces
         Task<bool> DeleteAsync(int id, int userId);
         Task<Review?> GetByUserAndProductAsync(int userId, int productId);
         Task<Review?> UpdateAsync(int id, int userId, int rating, string? comment);
+        Task<Review?> GetByIdAsync(int id, int userId);
+
     }
 }

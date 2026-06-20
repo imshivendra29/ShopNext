@@ -79,5 +79,12 @@ namespace ShopNext.Repositories.Implementations
             _context.Payments.Update(payment);
             await _context.SaveChangesAsync();
         }
+        public async Task<bool> HasUserPurchasedProductAsync(int userId, int productId)
+        {
+            return await _context.Orders
+                .AnyAsync(o => o.UserId == userId
+                    && o.Status == "Delivered"
+                    && o.OrderItems.Any(oi => oi.ProductId == productId));
+        }
     }
 }

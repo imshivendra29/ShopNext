@@ -8,5 +8,6 @@ namespace ShopNext.Services
         Task<ReviewResponseDto> CreateAsync(CreateReviewDto dto, int userId);
         Task<ReviewResponseDto?> UpdateAsync(int id, int userId, int rating, string? comment);
         Task<bool> DeleteAsync(int id, int userId);
+
     }
 }
