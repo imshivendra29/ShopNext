@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShopNext.DTOs.Payment;
+using ShopNext.Infrastructure.Payment.Interfaces;
 using ShopNext.Repositories.Interfaces;
-using ShopNext.Services.Interfaces;
 
 
 

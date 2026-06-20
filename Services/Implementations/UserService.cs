@@ -1,5 +1,6 @@
 ﻿using ShopNext.DTOs.User;
 using ShopNext.Exceptions;
+using ShopNext.Infrastructure.Cloudinary.Interfaces;
 using ShopNext.Repositories.Interfaces;
 
 namespace ShopNext.Services

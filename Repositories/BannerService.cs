@@ -3,6 +3,7 @@ using ShopNext.Models;
 using ShopNext.Repositories.Interfaces;
 using ShopNext.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using ShopNext.Infrastructure.Cloudinary.Interfaces;
 namespace ShopNext.Services.Implementations
 {
     public class BannerService : IBannerService

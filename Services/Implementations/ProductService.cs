@@ -1,4 +1,5 @@
 ﻿using ShopNext.DTOs.Product;
+using ShopNext.Infrastructure.Cloudinary.Interfaces;
 using ShopNext.Models;
 using ShopNext.Repositories.Interfaces;
 

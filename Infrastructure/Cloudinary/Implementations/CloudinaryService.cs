@@ -1,7 +1,7 @@
 ﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.Extensions.Configuration;
-using ShopNext.Services;
+using ShopNext.Infrastructure.Cloudinary.Interfaces;
 
 public class CloudinaryService : ICloudinaryService
 {

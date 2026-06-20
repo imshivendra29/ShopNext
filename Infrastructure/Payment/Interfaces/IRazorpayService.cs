@@ -1,4 +1,4 @@
-﻿namespace ShopNext.Services.Interfaces
+﻿namespace ShopNext.Infrastructure.Payment.Interfaces
 {
     public interface IRazorpayService
     {

@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Razorpay.Api;
 using ShopNext.Exceptions;
-using ShopNext.Services.Interfaces;
+using ShopNext.Infrastructure.Payment.Interfaces;
 using System.Security.Cryptography;
 using System.Text;
-namespace ShopNext.Services.Implementations
+namespace ShopNext.Infrastructure.Payment.Implementations
 {
     
 

@@ -1,4 +1,4 @@
-﻿namespace ShopNext.Services
+﻿namespace ShopNext.Infrastructure.Cloudinary.Interfaces
 {
     public interface ICloudinaryService
     {

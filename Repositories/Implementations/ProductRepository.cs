@@ -13,13 +13,13 @@ namespace ShopNext.Repositories.Implementations
             _context = context;
         }
         public async Task<(List<Product> Products, int TotalCount)> SearchAsync(
- string? keyword,
- int? categoryId,
- decimal? minPrice,
- decimal? maxPrice,
- string? sortBy,
- int page,
- int pageSize)
+           string? keyword,
+           int? categoryId,
+           decimal? minPrice,
+            decimal? maxPrice,
+           string? sortBy,
+           int page,
+           int pageSize)
         {
             var query = _context.Products
                 .Include(p => p.Category)
