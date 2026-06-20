@@ -145,7 +145,10 @@ builder.Services.AddSwaggerGen();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddHealthChecks()
     .AddNpgSql(connectionString, name: "postgres");
-
+// add connection string radis 
+var redisConnection =
+    Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")
+    ?? builder.Configuration["Redis:ConnectionString"];
 //build
 var app = builder.Build();
 //helth chekk
