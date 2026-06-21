@@ -104,15 +104,22 @@ builder.Services.AddDbContext<ShopNextDbContext>(options =>
 
 builder.Services.Configure<RedisOptions>(
     builder.Configuration.GetSection(RedisOptions.SectionName));
-
+//
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
     var redisConnection =
         Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")
         ?? builder.Configuration["Redis:ConnectionString"];
 
-    return ConnectionMultiplexer.Connect(redisConnection!);
+    var options = ConfigurationOptions.Parse(redisConnection!);
+    options.AbortOnConnectFail = false;
+    options.ConnectRetry = 2;
+    options.ConnectTimeout = 3000;
+    options.SyncTimeout = 3000;
+
+    return ConnectionMultiplexer.Connect(options);
 });
+//
 
 builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
 

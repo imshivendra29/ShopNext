@@ -7,7 +7,7 @@ namespace ShopNext.Infrastructure.Redis
 {
     public class RedisCacheService : IRedisCacheService
     {
-        private readonly IDatabase _db;
+        private readonly StackExchange.Redis.IDatabase _db;
         private readonly RedisOptions _options;
         private readonly ILogger<RedisCacheService> _logger;
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> _locks = new();
@@ -27,7 +27,10 @@ namespace ShopNext.Infrastructure.Redis
             try
             {
                 var value = await _db.StringGetAsync(key);
-                if (value.IsNull) return default;
+
+                if (value.IsNullOrEmpty)
+                    return default;
+
                 return JsonSerializer.Deserialize<T>(value!);
             }
             catch (Exception ex)
@@ -82,6 +85,9 @@ namespace ShopNext.Infrastructure.Redis
             finally
             {
                 lockObj.Release();
+
+                if (lockObj.CurrentCount == 1)
+                    _locks.TryRemove(key, out _);
             }
         }
     }
