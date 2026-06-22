@@ -17,6 +17,7 @@ using ShopNext.Services;
 using ShopNext.Services.Implementations;
 using ShopNext.Services.Interfaces;
 using StackExchange.Redis;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -104,7 +105,7 @@ builder.Services.AddDbContext<ShopNextDbContext>(options =>
 
 builder.Services.Configure<RedisOptions>(
     builder.Configuration.GetSection(RedisOptions.SectionName));
-//
+// radis
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
     var redisConnection =
@@ -119,7 +120,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 
     return ConnectionMultiplexer.Connect(options);
 });
-//
+//end
 
 builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
 
@@ -136,7 +137,7 @@ builder.Services.AddAuthentication("Bearer")
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-
+            RoleClaimType = ClaimTypes.Role,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
 
@@ -148,11 +149,15 @@ builder.Services.AddAuthentication("Bearer")
             )
         };
 });
+//end
 builder.Services.AddControllers();
 builder.Services.AddShopNextRateLimiter();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
+
 //for db helth check
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddHealthChecks()
@@ -183,7 +188,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
-// pipeline configuration
+//
 app.MapGet("/", () => "ShopNest API Running...");
 
 app.UseCors("AllowFrontend");

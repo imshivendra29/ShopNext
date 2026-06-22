@@ -38,10 +38,21 @@ namespace ShopNext.Controllers
             return Ok(new { message = "OTP sent successfully" });
         }
 
+        // Controllers/OtpController.cs
         [HttpPost("verify")]
         public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpDto dto)
         {
-            var result = await _service.VerifyOtpAsync(dto.Phone, dto.Otp);
+            var userId = int.Parse(User.FindFirst("uid")!.Value);
+            var user = await _userRepository.GetByIdAsync(userId);
+
+            if (user == null)
+                return NotFound(new { message = "User not found" });
+
+            if (string.IsNullOrEmpty(user.Phone))
+                return BadRequest(new { message = "No phone number on account" });
+
+            
+            var result = await _service.VerifyOtpAsync(user.Phone, dto.Otp);
             return Ok(new { message = "Phone verified successfully" });
         }
     }

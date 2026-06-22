@@ -7,9 +7,11 @@ namespace ShopNext.Infrastructure.Redis
 {
     public class RedisCacheService : IRedisCacheService
     {
-        private readonly StackExchange.Redis.IDatabase _db;
+        private readonly IDatabase _db;
+        private readonly IConnectionMultiplexer _redis;
         private readonly RedisOptions _options;
         private readonly ILogger<RedisCacheService> _logger;
+
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> _locks = new();
 
         public RedisCacheService(
@@ -17,6 +19,7 @@ namespace ShopNext.Infrastructure.Redis
             IOptions<RedisOptions> options,
             ILogger<RedisCacheService> logger)
         {
+            _redis = redis;
             _db = redis.GetDatabase();
             _options = options.Value;
             _logger = logger;
@@ -35,7 +38,7 @@ namespace ShopNext.Infrastructure.Redis
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("Redis GET failed for {Key}: {Message}", key, ex.Message);
+                _logger.LogWarning(ex, "Redis GET failed for {Key}", key);
                 return default;
             }
         }
@@ -46,11 +49,12 @@ namespace ShopNext.Infrastructure.Redis
             {
                 var serialized = JsonSerializer.Serialize(value);
                 var expiry = ttl ?? TimeSpan.FromMinutes(_options.DefaultTtlMinutes);
+
                 await _db.StringSetAsync(key, serialized, expiry);
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("Redis SET failed for {Key}: {Message}", key, ex.Message);
+                _logger.LogWarning(ex, "Redis SET failed for {Key}", key);
             }
         }
 
@@ -62,30 +66,69 @@ namespace ShopNext.Infrastructure.Redis
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("Redis DELETE failed for {Key}: {Message}", key, ex.Message);
+                _logger.LogWarning(ex, "Redis DELETE failed for {Key}", key);
             }
         }
 
-        public async Task<T> GetOrSetAsync<T>(string key, Func<Task<T>> factory, TimeSpan? ttl = null)
+        public async Task DeleteByPatternAsync(string pattern)
+        {
+            try
+            {
+                var endpoint = _redis.GetEndPoints().FirstOrDefault();
+
+                if (endpoint == null)
+                    return;
+
+                var server = _redis.GetServer(endpoint);
+                var keys = new List<RedisKey>();
+
+                await foreach (var key in server.KeysAsync(pattern: pattern, pageSize: 250))
+                {
+                    keys.Add(key);
+                }
+
+                if (keys.Count > 0)
+                {
+                    await _db.KeyDeleteAsync(keys.ToArray());
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Redis pattern delete failed for {Pattern}", pattern);
+            }
+        }
+
+        public async Task<T> GetOrSetAsync<T>(
+            string key,
+            Func<Task<T>> factory,
+            TimeSpan? ttl = null)
         {
             var cached = await GetAsync<T>(key);
-            if (cached != null) return cached;
+
+            if (cached is not null)
+                return cached;
 
             var lockObj = _locks.GetOrAdd(key, _ => new SemaphoreSlim(1, 1));
+
             await lockObj.WaitAsync();
+
             try
             {
                 cached = await GetAsync<T>(key);
-                if (cached != null) return cached;
+
+                if (cached is not null)
+                    return cached;
 
                 var data = await factory();
-                await SetAsync(key, data, ttl);
+
+                if (data is not null)
+                    await SetAsync(key, data, ttl);
+
                 return data;
             }
             finally
             {
                 lockObj.Release();
-
                 if (lockObj.CurrentCount == 1)
                     _locks.TryRemove(key, out _);
             }

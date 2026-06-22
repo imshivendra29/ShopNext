@@ -27,6 +27,21 @@ public static class RateLimiterExtensions
                         AutoReplenishment = true
                     });
             });
+            // 
+            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+            {
+                var ip = GetClientIp(context);
+
+                return RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: ip,
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 100,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0,
+                        AutoReplenishment = true
+                    });
+            });
 
             options.AddPolicy(RateLimitPolicies.Otp, context =>
             {

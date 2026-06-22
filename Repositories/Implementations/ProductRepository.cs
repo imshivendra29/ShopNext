@@ -85,7 +85,41 @@ namespace ShopNext.Repositories.Implementations
 
             return product;
         }
+        //fix
+        public async Task<Dictionary<int, decimal>> GetFreshPricesAsync(List<int> productIds)
+        {
+            return await _context.Products
+                .Where(p => productIds.Contains(p.Id) && p.IsActive)
+                .ToDictionaryAsync(p => p.Id, p => p.Price);
+        }
+        public async Task RecalculateRatingAsync(int productId)
+        {
+            var stats = await _context.Reviews
+                .Where(r => r.ProductId == productId)
+                .GroupBy(r => r.ProductId)
+                .Select(g => new
+                {
+                    Avg = g.Average(r => (double)r.Rating),
+                    Count = g.Count()
+                })
+                .FirstOrDefaultAsync();
 
+            await _context.Products
+                .Where(p => p.Id == productId)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(p => p.AverageRating, stats == null ? 0 : stats.Avg)
+                    .SetProperty(p => p.ReviewCount, stats == null ? 0 : stats.Count));
+        }
+        public async Task<bool> DeductStockAsync(int productId, int quantity)
+        {
+            
+            var updated = await _context.Products
+                .Where(p => p.Id == productId && p.Stock >= quantity)
+                .ExecuteUpdateAsync(s => s.SetProperty(
+                    p => p.Stock, p => p.Stock - quantity));
+
+            return updated > 0; 
+        }
         public async Task<Product?> UpdateAsync(int id, Product product)
         {
             var existing = await _context.Products.FindAsync(id);

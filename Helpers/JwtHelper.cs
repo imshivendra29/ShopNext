@@ -25,9 +25,8 @@ namespace ShopNext.Helpers
             {
                  new Claim("uid", user.Id.ToString()),
            new Claim("name", user.Name),
-new Claim("email", user.Email),
-new Claim("role", user.Role)
-
+           new Claim("email", user.Email),
+           new Claim(ClaimTypes.Role, user.Role) //fix bug: use ClaimTypes.Role instead of "role"
         };
 
             var key = new SymmetricSecurityKey(

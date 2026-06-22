@@ -2,6 +2,7 @@
 using ShopNext.Repositories.Interfaces;
 using ShopNext.Services;
 
+
 public class CartService : ICartService
 {
     private readonly ICartRepository _repository;

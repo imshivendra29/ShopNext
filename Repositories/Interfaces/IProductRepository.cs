@@ -9,6 +9,9 @@ namespace ShopNext.Repositories.Interfaces
         Task<Product> CreateAsync(Product product);
         Task<Product?> UpdateAsync(int id, Product product);
         Task<bool> DeleteAsync(int id);
+        Task<Dictionary<int, decimal>> GetFreshPricesAsync(List<int> productIds);
+        Task<bool> DeductStockAsync(int productId, int quantity);
+        Task RecalculateRatingAsync(int productId);
         Task<(List<Product> Products, int TotalCount)> SearchAsync(
     string? keyword,
     int? categoryId,

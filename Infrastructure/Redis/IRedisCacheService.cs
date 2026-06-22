@@ -4,4 +4,5 @@
     Task SetAsync<T>(string key, T value, TimeSpan? ttl = null);
     Task DeleteAsync(string key);
     Task<T> GetOrSetAsync<T>(string key, Func<Task<T>> factory, TimeSpan? ttl = null);
+    Task DeleteByPatternAsync(string pattern);
 }
