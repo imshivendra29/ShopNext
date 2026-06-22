@@ -47,6 +47,7 @@ namespace ShopNext.Controllers
         [HttpPatch("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
         {
+
             await _userService.ChangePasswordAsync(GetUserId(), dto);
             return Ok(new { Message = "Password changed" });
         }

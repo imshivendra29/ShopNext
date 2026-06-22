@@ -17,16 +17,16 @@ namespace ShopNext.Middleware
         {
             try
             {
-                await _next(context); 
+                await _next(context);
             }
             catch (AppException ex)
             {
-                
+
                 await WriteResponse(context, ex.StatusCode, ex.Message);
             }
             catch (Exception)
             {
-                
+
                 await WriteResponse(context, 500, "Something went wrong");
             }
         }
