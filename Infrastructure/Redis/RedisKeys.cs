@@ -21,5 +21,15 @@
         {
             return $"products:search:{keyword}:{categoryId}:{minPrice}:{maxPrice}:{sortBy}:{page}:{pageSize}";
         }
+
+        //phone otp 
+        public static class Otp
+        {
+            public static string Hash(string phone) => $"otp:{phone}:hash";
+            public static string Attempts(string phone) => $"otp:{phone}:attempts";
+            public static string Cooldown(string phone) => $"otp:{phone}:cooldown";
+            public static string Hourly(string phone) => $"otp:{phone}:hourly";
+            public static string Blocked(string phone) => $"otp:{phone}:blocked";
+        }
     }
 }

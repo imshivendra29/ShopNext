@@ -97,6 +97,37 @@ namespace ShopNext.Infrastructure.Redis
                 _logger.LogWarning(ex, "Redis pattern delete failed for {Pattern}", pattern);
             }
         }
+        //otp cach
+        public async Task<bool> ExistsAsync(string key)
+        {
+            try
+            {
+                return await _db.KeyExistsAsync(key);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Redis EXISTS failed for {Key}", key);
+                return false;
+            }
+        }
+
+        public async Task<long> IncrementAsync(string key, TimeSpan? expiry = null)
+        {
+            try
+            {
+                var value = await _db.StringIncrementAsync(key);
+
+                if (value == 1 && expiry.HasValue)
+                    await _db.KeyExpireAsync(key, expiry);
+
+                return value;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Redis INCREMENT failed for {Key}", key);
+                return 0;
+            }
+        }
 
         public async Task<T> GetOrSetAsync<T>(
             string key,
