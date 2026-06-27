@@ -1,8 +1,14 @@
-﻿namespace ShopNext.DTOs.Order
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ShopNext.DTOs.Order
 {
     public class PlaceOrderDto
     {
-        public string ShippingAddress { get; set; } = string.Empty;
-        public string PaymentMethod { get; set; } = "COD"; // COD ya Online
+        [Required]
+        [StringLength(500, MinimumLength = 10)]
+        public required string ShippingAddress { get; set; }
+
+        [Required]
+        public required string PaymentMethod { get; set; }
     }
 }

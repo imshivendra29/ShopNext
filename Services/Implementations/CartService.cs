@@ -50,7 +50,7 @@ public class CartService : ICartService
     {
         await _repository.RemoveItemFromCartAsync(userId, productId);
     }
-
+   
     public async Task ClearCartAsync(int userId)
     {
         var cart = await _repository.GetCartByUserIdAsync(userId);

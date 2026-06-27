@@ -22,7 +22,7 @@ namespace ShopNext.DTOs.Product
 
         [Required]
         public int CategoryId { get; set; }
-
+        public bool IsCodAvailable { get; set; } = true;
         public IFormFile? Image { get; set; }
 
     }

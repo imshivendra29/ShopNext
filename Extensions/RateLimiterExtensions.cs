@@ -43,21 +43,21 @@ public static class RateLimiterExtensions
                     });
             });
 
-            options.AddPolicy(RateLimitPolicies.Otp, context =>
-            {
-                var ip = GetClientIp(context);
+           // options.AddPolicy(RateLimitPolicies.Otp, context =>
+            //{
+           //     var ip = GetClientIp(context);
 
-                return RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey: ip,
-                    factory: _ => new FixedWindowRateLimiterOptions
-                    {
-                        PermitLimit = 3,
-                        Window = TimeSpan.FromMinutes(10),
-                        QueueLimit = 0,
-                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                        AutoReplenishment = true
-                    });
-            });
+           //     return RateLimitPartition.GetFixedWindowLimiter(
+            //        partitionKey: ip,
+              //      factory: _ => new FixedWindowRateLimiterOptions
+              //      {
+              //          PermitLimit = 3,
+               //         Window = TimeSpan.FromMinutes(10),
+               //         QueueLimit = 0,
+                //        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                //        AutoReplenishment = true
+                //    });
+         //   });
 
             options.AddPolicy(RateLimitPolicies.Search, context =>
             {

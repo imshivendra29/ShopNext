@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ShopNext.Data;
@@ -11,9 +12,11 @@ using ShopNext.Data;
 namespace ShopNext.Migrations
 {
     [DbContext(typeof(ShopNextDbContext))]
-    partial class ShopNextDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260627103620_AddIsCodAvailableToProduct")]
+    partial class AddIsCodAvailableToProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,52 +24,6 @@ namespace ShopNext.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PaymentStatus")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("RazorpayOrderId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("RazorpayPaymentId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ShippingAddress")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Orders");
-                });
 
             modelBuilder.Entity("ShopNext.Models.Address", b =>
                 {
@@ -208,6 +165,49 @@ namespace ShopNext.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("ShopNext.Models.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RazorpayOrderId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ShippingAddress")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("ShopNext.Models.OrderItem", b =>
@@ -459,25 +459,14 @@ namespace ShopNext.Migrations
                         new
                         {
                             Id = 11,
-                            CreatedAt = new DateTime(2026, 6, 27, 17, 2, 10, 733, DateTimeKind.Utc).AddTicks(625),
+                            CreatedAt = new DateTime(2026, 6, 27, 10, 36, 15, 485, DateTimeKind.Utc).AddTicks(5500),
                             Email = "admin@shopnext.com",
                             IsActive = true,
                             IsPhoneVerified = false,
                             Name = "Admin",
-                            PasswordHash = "$2a$11$OTUtse9nHAmHy3oLnB1Nn.CYQU8CelGq3nFCmPfuTCdm0KXCdM9pe",
+                            PasswordHash = "$2a$11$1fg89rvWYiEeI5j88oYJXuq0L4E4cylO2yuQY8YQ.BRdKfn8Q/eD6",
                             Role = "Admin"
                         });
-                });
-
-            modelBuilder.Entity("Order", b =>
-                {
-                    b.HasOne("ShopNext.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ShopNext.Models.Address", b =>
@@ -521,9 +510,20 @@ namespace ShopNext.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("ShopNext.Models.Order", b =>
+                {
+                    b.HasOne("ShopNext.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ShopNext.Models.OrderItem", b =>
                 {
-                    b.HasOne("Order", "Order")
+                    b.HasOne("ShopNext.Models.Order", "Order")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -542,7 +542,7 @@ namespace ShopNext.Migrations
 
             modelBuilder.Entity("ShopNext.Models.Payment", b =>
                 {
-                    b.HasOne("Order", "Order")
+                    b.HasOne("ShopNext.Models.Order", "Order")
                         .WithOne("Payment")
                         .HasForeignKey("ShopNext.Models.Payment", "OrderId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -589,13 +589,6 @@ namespace ShopNext.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Order", b =>
-                {
-                    b.Navigation("OrderItems");
-
-                    b.Navigation("Payment");
-                });
-
             modelBuilder.Entity("ShopNext.Models.Cart", b =>
                 {
                     b.Navigation("CartItems");
@@ -604,6 +597,13 @@ namespace ShopNext.Migrations
             modelBuilder.Entity("ShopNext.Models.Category", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("ShopNext.Models.Order", b =>
+                {
+                    b.Navigation("OrderItems");
+
+                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("ShopNext.Models.Product", b =>

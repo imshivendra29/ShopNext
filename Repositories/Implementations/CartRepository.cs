@@ -88,5 +88,16 @@ namespace ShopNext.Repositories.Implementations
             _context.CartItems.RemoveRange(items);
             await _context.SaveChangesAsync();
         }
+        public async Task ClearCartByUserIdAsync(int userId)
+        {
+            var cart = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (cart == null) return;
+
+            _context.CartItems.RemoveRange(cart.CartItems);
+            await _context.SaveChangesAsync();
+        }
     }
 }

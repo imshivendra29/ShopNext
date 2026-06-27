@@ -65,6 +65,12 @@ namespace ShopNext.Repositories.Implementations
                 .Include(p => p.Category)
                 .ToListAsync();
         }
+        public async Task<List<Product>> GetProductsByIdsAsync(List<int> productIds)
+        {
+            return await _context.Products
+                .Where(p => productIds.Contains(p.Id))
+                .ToListAsync();
+        }
 
         public async Task<Product?> GetByIdAsync(int id)
         {
@@ -132,7 +138,7 @@ namespace ShopNext.Repositories.Implementations
             existing.ImageUrl = product.ImageUrl;
             existing.CategoryId = product.CategoryId;
             existing.IsActive = product.IsActive;
-
+            existing.IsCodAvailable = product.IsCodAvailable;
             await _context.SaveChangesAsync();
             return existing;
         }

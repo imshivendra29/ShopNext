@@ -9,6 +9,7 @@ namespace ShopNext.Repositories.Interfaces
         Task UpdateItemQuantityAsync(int userId, int productId, int quantity);
         Task RemoveItemFromCartAsync(int userId, int productId);
         Task ClearCartAsync(int cartId);
+        Task ClearCartByUserIdAsync(int userId);
     }
     
 }

@@ -1,7 +1,9 @@
-﻿using ShopNext.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using ShopNext.Constants;
+using ShopNext.Data;
 using ShopNext.Models;
 using ShopNext.Repositories.Interfaces;
-using Microsoft.EntityFrameworkCore;
+
 namespace ShopNext.Repositories.Implementations
 {
     public class OrderRepository : IOrderRepository
@@ -24,16 +26,25 @@ namespace ShopNext.Repositories.Implementations
         {
             return await _context.Orders
                 .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Product)
+                    .ThenInclude(oi => oi.Product)
                 .Include(o => o.Payment)
                 .FirstOrDefaultAsync(o => o.Id == id && o.UserId == userId);
+        }
+
+        public async Task<Order?> GetByIdForUpdateAsync(int id)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .Include(o => o.Payment)
+                .FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task<List<Order>> GetUserOrdersAsync(int userId)
         {
             return await _context.Orders
                 .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Product)
+                    .ThenInclude(oi => oi.Product)
                 .Include(o => o.Payment)
                 .Where(o => o.UserId == userId)
                 .OrderByDescending(o => o.CreatedAt)
@@ -42,49 +53,31 @@ namespace ShopNext.Repositories.Implementations
 
         public async Task<Order?> UpdateStatusAsync(int id, string status)
         {
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .Include(o => o.Payment)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
             if (order == null) return null;
 
             order.Status = status;
             await _context.SaveChangesAsync();
+
             return order;
         }
 
-        public async Task<Order?> UpdatePaymentStatusAsync(int id, string paymentStatus)
-        {
-            var order = await _context.Orders.FindAsync(id);
-            if (order == null) return null;
-
-            order.PaymentStatus = paymentStatus;
-            await _context.SaveChangesAsync();
-            return order;
-        }
-        public async Task UpdateRazorpayOrderIdAsync(int orderId, string razorpayOrderId)
-        {
-            var order = await _context.Orders.FindAsync(orderId);
-            if (order == null) return;
-
-            order.RazorpayOrderId = razorpayOrderId;
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<Payment?> GetPaymentByOrderIdAsync(int orderId)
-        {
-            return await _context.Payments
-                .FirstOrDefaultAsync(p => p.OrderId == orderId);
-        }
-
-        public async Task UpdatePaymentAsync(Payment payment)
-        {
-            _context.Payments.Update(payment);
-            await _context.SaveChangesAsync();
-        }
         public async Task<bool> HasUserPurchasedProductAsync(int userId, int productId)
         {
             return await _context.Orders
                 .AnyAsync(o => o.UserId == userId
-                    && o.Status == "Delivered"
+                    && o.Status == OrderStatuses.Delivered
+                    && o.PaymentStatus == PaymentStatuses.Paid
                     && o.OrderItems.Any(oi => oi.ProductId == productId));
+        }
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
         }
     }
 }

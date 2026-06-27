@@ -3,14 +3,15 @@
     public class Product
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public  required string Name { get; set; } 
         public string Description { get; set; } = string.Empty;
         public decimal Price { get; set; }
         public int Stock { get; set; }
-        public string ImageUrl { get; set; } 
+        public required string ImageUrl { get; set; } 
         public double AverageRating { get; set; } = 0;
         public int ReviewCount { get; set; } = 0;
         public bool IsActive { get; set; } = true;
+        public bool IsCodAvailable { get; set; } = true;
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
         public int CategoryId { get; set; }
         public int CreatedBy { get; set; }

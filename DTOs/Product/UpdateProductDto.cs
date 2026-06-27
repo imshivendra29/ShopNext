@@ -10,6 +10,7 @@
         public int CategoryId { get; set; }
         public bool IsActive { get; set; }
         public IFormFile? Image { get; set; }
+        public bool IsCodAvailable { get; set; } = true;
 
 
     }

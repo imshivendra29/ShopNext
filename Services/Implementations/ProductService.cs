@@ -103,7 +103,8 @@ namespace ShopNext.Services
                 Stock = dto.Stock,
                 ImageUrl = imageUrl,
                 CategoryId = dto.CategoryId,
-                CreatedBy = adminId
+                CreatedBy = adminId,
+                IsCodAvailable = dto.IsCodAvailable
             };
 
             var created = await _repository.CreateAsync(product);
@@ -128,7 +129,8 @@ namespace ShopNext.Services
                 Stock = dto.Stock,
                 ImageUrl = imageUrl,
                 CategoryId = dto.CategoryId,
-                IsActive = dto.IsActive
+                IsActive = dto.IsActive,
+                IsCodAvailable = dto.IsCodAvailable
             };
 
             var updated = await _repository.UpdateAsync(id, product);

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using ShopNext.Constants;
@@ -34,7 +33,7 @@ namespace ShopNext.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+       [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromForm] CreateProductDto dto)
         {
             var adminId = int.Parse(User.FindFirst("uid")!.Value);

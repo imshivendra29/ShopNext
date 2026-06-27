@@ -39,7 +39,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownNetworks.Clear();
     options.KnownProxies.Clear();
 });
-
+// CROS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -57,7 +57,7 @@ builder.Services.AddCors(options =>
 });
 
 //SERVICES
-
+// REPOSE
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
@@ -92,9 +92,10 @@ builder.Services.AddHttpClient<OtpService>();
 
 builder.Services.AddScoped<IBannerRepository, BannerRepository>();
 builder.Services.AddScoped<IBannerService, BannerService>();
-
+//JWT
 builder.Services.AddScoped<JwtHelper>();
-
+//unitofworks
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 // DATABASE
 
 builder.Services.AddDbContext<ShopNextDbContext>(options =>
